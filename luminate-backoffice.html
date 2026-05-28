@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luminate Glow — Back Office</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --pink:#F2A7A7;--gold:#D4924A;--gold-light:#EDBB7A;
+      --cream:#FEF8F0;--warm:#FDF3E3;--text:#2B1A0E;
+      --text-soft:#7A5240;--white:#FFFCF9;--green:#5A9A5A;
+    }
+    body{font-family:'DM Sans',sans-serif;background:#1A0F08;color:var(--white);min-height:100vh;}
+
+    /* LOGIN */
+    .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1A0F08,#2E1008);}
+    .login-card{background:rgba(255,252,249,0.05);border:1px solid rgba(212,146,74,0.2);border-radius:24px;padding:3rem;width:90%;max-width:400px;text-align:center;}
+    .login-logo{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;}
+    .login-sub{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(212,146,74,0.5);margin-bottom:2rem;}
+    .login-input{width:100%;padding:0.9rem 1.2rem;background:rgba(255,252,249,0.08);border:1.5px solid rgba(212,146,74,0.25);border-radius:12px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;margin-bottom:1rem;box-sizing:border-box;}
+    .login-input::placeholder{color:rgba(255,252,249,0.3);}
+    .login-btn{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--gold),#A0622A);border:none;border-radius:12px;color:white;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;}
+    .login-error{color:var(--pink);font-size:0.8rem;margin-top:0.5rem;display:none;}
+
+    /* DASHBOARD */
+    .dashboard{display:none;}
+    .topbar{background:rgba(255,252,249,0.05);border-bottom:1px solid rgba(212,146,74,0.15);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;}
+    .topbar-logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);}
+    .topbar-right{display:flex;align-items:center;gap:1rem;}
+    .logout-btn{background:none;border:1px solid rgba(212,146,74,0.3);border-radius:20px;padding:0.35rem 1rem;color:rgba(212,146,74,0.7);font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .main{padding:2rem;max-width:1100px;margin:0 auto;}
+    .greeting{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold-light);margin-bottom:0.3rem;}
+    .greeting-sub{font-size:0.82rem;color:rgba(212,146,74,0.5);margin-bottom:2rem;}
+
+    /* STAT CARDS */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+    .stat-card{background:rgba(255,252,249,0.04);border:1px solid rgba(212,146,74,0.15);border-radius:16px;padding:1.2rem 1.5rem;}
+    .stat-label{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(212,146,74,0.5);margin-bottom:0.4rem;}
+    .stat-value{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold-light);line-height:1;}
+    .stat-note{font-size:0.72rem;color:rgba(255,252,249,0.3);margin-top:0.3rem;}
+
+    /* SECTIONS */
+    .section-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:1rem;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+    .box{background:rgba(255,252,249,0.04);border:1px solid rgba(212,146,74,0.15);border-radius:16px;padding:1.5rem;}
+    .box-title{font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(212,146,74,0.5);margin-bottom:1rem;}
+
+    /* CODE MANAGER */
+    .code-row{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 0.8rem;background:rgba(255,252,249,0.04);border-radius:10px;margin-bottom:0.5rem;}
+    .code-badge{background:rgba(212,146,74,0.15);border-radius:6px;padding:0.2rem 0.6rem;font-size:0.75rem;color:var(--gold-light);font-weight:500;letter-spacing:0.08em;}
+    .code-info{font-size:0.75rem;color:rgba(255,252,249,0.5);}
+    .code-toggle{background:none;border:1px solid rgba(212,146,74,0.3);border-radius:8px;padding:0.25rem 0.7rem;font-size:0.7rem;color:rgba(212,146,74,0.7);cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+    /* CHECKLIST */
+    .check-item{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid rgba(212,146,74,0.08);}
+    .check-box{width:18px;height:18px;border:2px solid rgba(212,146,74,0.4);border-radius:4px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--gold);}
+    .check-box.done{background:var(--gold);border-color:var(--gold);color:white;}
+    .check-text{font-size:0.82rem;color:rgba(255,252,249,0.7);}
+    .check-text.done{text-decoration:line-through;color:rgba(255,252,249,0.3);}
+
+    /* LINKS MANAGER */
+    .link-row{margin-bottom:0.8rem;}
+    .link-label{font-size:0.72rem;color:rgba(212,146,74,0.6);margin-bottom:0.3rem;}
+    .link-input{width:100%;padding:0.65rem 0.9rem;background:rgba(255,252,249,0.06);border:1px solid rgba(212,146,74,0.2);border-radius:8px;color:rgba(255,252,249,0.8);font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none;box-sizing:border-box;}
+    .save-btn{background:linear-gradient(135deg,var(--pink),#E8898A);border:none;border-radius:10px;padding:0.6rem 1.5rem;color:white;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;margin-top:0.8rem;}
+    .save-confirm{font-size:0.75rem;color:var(--green);margin-left:0.8rem;display:none;}
+
+    /* NOTES */
+    .notes-area{width:100%;min-height:120px;padding:0.8rem 1rem;background:rgba(255,252,249,0.06);border:1px solid rgba(212,146,74,0.2);border-radius:10px;color:rgba(255,252,249,0.8);font-family:'DM Sans',sans-serif;font-size:0.82rem;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6;}
+
+    @media(max-width:768px){
+      .stats{grid-template-columns:1fr 1fr;}
+      .grid-2{grid-template-columns:1fr;}
+      .main{padding:1rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <p class="login-logo">LUMINATE GLOW</p>
+    <p class="login-sub">Back Office · Isabella Only</p>
+    <input class="login-input" type="password" id="pwInput" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Sign In ☀️</button>
+    <p class="login-error" id="loginError">Incorrect password. Try again.</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+
+  <div class="topbar">
+    <p class="topbar-logo">LUMINATE GLOW ☀️ Back Office</p>
+    <div class="topbar-right">
+      <a href="luminate.html" target="_blank" style="font-size:0.75rem;color:rgba(212,146,74,0.6);text-decoration:none;">View Live Site →</a>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <p class="greeting" id="greetingText">Good morning, Isabella ☀️</p>
+    <p class="greeting-sub" id="greetingDate"></p>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card">
+        <p class="stat-label">Monthly Subscribers</p>
+        <p class="stat-value" id="statMonthly">—</p>
+        <p class="stat-note">Check Stripe dashboard</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Annual Members</p>
+        <p class="stat-value" id="statAnnual">—</p>
+        <p class="stat-note">Check Stripe dashboard</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Monthly Revenue</p>
+        <p class="stat-value" id="statRevenue">—</p>
+        <p class="stat-note">Est. based on subscribers</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">GLOW10 Codes Used</p>
+        <p class="stat-value" id="statCodes">—</p>
+        <p class="stat-note">Check Stripe coupons</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- STRIPE LINKS MANAGER -->
+      <div class="box">
+        <p class="box-title">💳 Stripe Payment Links</p>
+        <p style="font-size:0.78rem;color:rgba(255,252,249,0.4);margin-bottom:1rem;line-height:1.5;">Paste your Stripe payment links here. Copy these into your website's "Start Glowing" and "Get the Year" buttons.</p>
+        <div class="link-row">
+          <p class="link-label">Monthly $4.99/mo Payment Link</p>
+          <input class="link-input" id="monthlyLink" placeholder="https://buy.stripe.com/..." oninput="saveLinks()"/>
+        </div>
+        <div class="link-row">
+          <p class="link-label">Annual $60.00 Payment Link</p>
+          <input class="link-input" id="annualLink" placeholder="https://buy.stripe.com/..." oninput="saveLinks()"/>
+        </div>
+        <button class="save-btn" onclick="copyInstructions()">How to add to website 📋</button>
+        <span class="save-confirm" id="saveConfirm">✓ Saved</span>
+        <div id="instructions" style="display:none;margin-top:1rem;background:rgba(212,146,74,0.08);border-radius:10px;padding:1rem;font-size:0.78rem;color:rgba(255,252,249,0.6);line-height:1.7;">
+          1. Open luminate.html in a text editor<br/>
+          2. Find: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px;">href="#"</code> on the "Start Monthly" button<br/>
+          3. Replace # with your monthly Stripe link<br/>
+          4. Find the "Get the Year" button and do the same with annual link<br/>
+          5. Save and re-upload to Netlify
+        </div>
+      </div>
+
+      <!-- PROMO CODES -->
+      <div class="box">
+        <p class="box-title">🎟️ Promo Codes</p>
+        <div class="code-row">
+          <div>
+            <span class="code-badge">GLOW10</span>
+            <p class="code-info" style="margin-top:0.3rem;">50% off · First 10 members</p>
+          </div>
+          <button class="code-toggle" onclick="toggleCode(this)">Active ✓</button>
+        </div>
+        <div class="code-row">
+          <div>
+            <span class="code-badge">O5F0F</span>
+            <p class="code-info" style="margin-top:0.3rem;">50% off · Complaint resolution</p>
+          </div>
+          <button class="code-toggle" onclick="toggleCode(this)">Active ✓</button>
+        </div>
+        <div id="extraCodes"></div>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+          <input id="newCode" class="link-input" placeholder="New code name" style="flex:1;"/>
+          <button class="save-btn" style="padding:0.6rem 1rem;margin-top:0;" onclick="addCode()">+ Add</button>
+        </div>
+        <p style="font-size:0.72rem;color:rgba(255,252,249,0.3);margin-top:0.8rem;">Add all codes in Stripe Coupons too!</p>
+      </div>
+
+    </div>
+
+    <div class="grid-2">
+
+      <!-- LAUNCH CHECKLIST -->
+      <div class="box">
+        <p class="box-title">🚀 Launch Checklist</p>
+        <div id="checklistItems"></div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="box">
+        <p class="box-title">📝 Your Notes</p>
+        <textarea class="notes-area" id="myNotes" placeholder="Ideas, to-dos, member feedback, product notes..." oninput="saveNotes()"></textarea>
+        <p style="font-size:0.7rem;color:rgba(255,252,249,0.2);margin-top:0.5rem;">Auto-saves as you type</p>
+      </div>
+
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="box" style="margin-bottom:2rem;">
+      <p class="box-title">⚡ Quick Links</p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+        <a href="https://dashboard.stripe.com" target="_blank" style="background:rgba(212,146,74,0.12);border:1px solid rgba(212,146,74,0.2);border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;color:var(--gold-light);text-decoration:none;">Stripe Dashboard →</a>
+        <a href="https://app.netlify.com" target="_blank" style="background:rgba(212,146,74,0.12);border:1px solid rgba(212,146,74,0.2);border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;color:var(--gold-light);text-decoration:none;">Netlify (update site) →</a>
+        <a href="https://instagram.com/glow.luminate" target="_blank" style="background:rgba(242,167,167,0.12);border:1px solid rgba(242,167,167,0.2);border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;color:var(--pink);text-decoration:none;">Instagram →</a>
+        <a href="mailto:luminate.glow@aol.com" style="background:rgba(212,146,74,0.12);border:1px solid rgba(212,146,74,0.2);border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;color:var(--gold-light);text-decoration:none;">Check Email →</a>
+        <a href="luminate.html" target="_blank" style="background:rgba(242,167,167,0.12);border:1px solid rgba(242,167,167,0.2);border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;color:var(--pink);text-decoration:none;">Live Website →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── AUTH ─────────────────────────────────────────────────────────────
+const PASSWORD = 'LuminateGlow2026';
+
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if(pw === PASSWORD) {
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    initDashboard();
+  } else {
+    document.getElementById('loginError').style.display='block';
+  }
+}
+
+function logout() {
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('pwInput').value='';
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+function initDashboard() {
+  // Greeting
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greetingText').textContent = `${greeting}, Isabella ☀️`;
+  document.getElementById('greetingDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  // Load saved data
+  loadLinks();
+  loadNotes();
+  loadChecklist();
+  loadCodes();
+  loadStats();
+}
+
+// ── LINKS ────────────────────────────────────────────────────────────
+function saveLinks() {
+  const ml = document.getElementById('monthlyLink').value;
+  const al = document.getElementById('annualLink').value;
+  try { localStorage.setItem('lg_monthly_link', ml); localStorage.setItem('lg_annual_link', al); } catch(e){}
+  const c = document.getElementById('saveConfirm');
+  c.style.display='inline';
+  setTimeout(()=>c.style.display='none',1500);
+}
+
+function loadLinks() {
+  try {
+    document.getElementById('monthlyLink').value = localStorage.getItem('lg_monthly_link')||'';
+    document.getElementById('annualLink').value = localStorage.getItem('lg_annual_link')||'';
+  } catch(e){}
+}
+
+function copyInstructions() {
+  const el = document.getElementById('instructions');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+// ── NOTES ────────────────────────────────────────────────────────────
+function saveNotes() {
+  try { localStorage.setItem('lg_notes', document.getElementById('myNotes').value); } catch(e){}
+}
+function loadNotes() {
+  try { document.getElementById('myNotes').value = localStorage.getItem('lg_notes')||''; } catch(e){}
+}
+
+// ── CHECKLIST ────────────────────────────────────────────────────────
+const CHECKLIST = [
+  'Stripe account verified',
+  'Monthly $4.99 payment link created',
+  'Annual $60 payment link created',
+  'Payment links added to website buttons',
+  'GLOW10 coupon created in Stripe',
+  'O5F0F coupon created in Stripe',
+  'Auto-payout set up in Stripe',
+  'Website deployed to Netlify',
+  'Instagram @glow.luminate created',
+  'First FB group post published',
+  'First TikTok posted',
+  'Domain luminateglowing.com purchased',
+];
+
+function loadChecklist() {
+  const saved = JSON.parse(localStorage.getItem('lg_checklist')||'{}');
+  const el = document.getElementById('checklistItems');
+  el.innerHTML = CHECKLIST.map((item,i) => `
+    <div class="check-item">
+      <div class="check-box ${saved[i]?'done':''}" onclick="toggleCheck(${i},this)">
+        ${saved[i]?'✓':''}
+      </div>
+      <span class="check-text ${saved[i]?'done':''}">${item}</span>
+    </div>`).join('');
+}
+
+function toggleCheck(i, el) {
+  const saved = JSON.parse(localStorage.getItem('lg_checklist')||'{}');
+  saved[i] = !saved[i];
+  try { localStorage.setItem('lg_checklist', JSON.stringify(saved)); } catch(e){}
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.nextElementSibling.classList.toggle('done');
+}
+
+// ── CODES ────────────────────────────────────────────────────────────
+let extraCodes = JSON.parse(localStorage.getItem('lg_extra_codes')||'[]');
+
+function loadCodes() {
+  renderCodes();
+}
+
+function renderCodes() {
+  document.getElementById('extraCodes').innerHTML = extraCodes.map((code,i) => `
+    <div class="code-row">
+      <div>
+        <span class="code-badge">${code.name}</span>
+        <p class="code-info" style="margin-top:0.3rem;">${code.note||'Custom code'}</p>
+      </div>
+      <button class="code-toggle" onclick="removeCode(${i})">Remove</button>
+    </div>`).join('');
+}
+
+function addCode() {
+  const name = document.getElementById('newCode').value.trim().toUpperCase();
+  if(!name) return;
+  extraCodes.push({name, note:'Custom code'});
+  try { localStorage.setItem('lg_extra_codes', JSON.stringify(extraCodes)); } catch(e){}
+  renderCodes();
+  document.getElementById('newCode').value='';
+}
+
+function removeCode(i) {
+  extraCodes.splice(i,1);
+  try { localStorage.setItem('lg_extra_codes', JSON.stringify(extraCodes)); } catch(e){}
+  renderCodes();
+}
+
+function toggleCode(btn) {
+  const active = btn.textContent.includes('Active');
+  btn.textContent = active ? 'Paused' : 'Active ✓';
+  btn.style.color = active ? 'rgba(242,167,167,0.5)' : 'rgba(212,146,74,0.7)';
+}
+
+// ── STATS ────────────────────────────────────────────────────────────
+function loadStats() {
+  const m = parseInt(localStorage.getItem('lg_stat_monthly')||'0');
+  const a = parseInt(localStorage.getItem('lg_stat_annual')||'0');
+  document.getElementById('statMonthly').textContent = m;
+  document.getElementById('statAnnual').textContent = a;
+  document.getElementById('statRevenue').textContent = '$' + ((m*4.99)+(a*5)).toFixed(2);
+  document.getElementById('statCodes').textContent = localStorage.getItem('lg_codes_used')||'0';
+
+  // Make stats editable on click
+  ['statMonthly','statAnnual'].forEach(id => {
+    document.getElementById(id).onclick = function() {
+      const val = prompt('Update count:', this.textContent);
+      if(val !== null) {
+        this.textContent = parseInt(val)||0;
+        localStorage.setItem('lg_stat_'+id.replace('stat','').toLowerCase(), parseInt(val)||0);
+        loadStats();
+      }
+    };
+    document.getElementById(id).style.cursor='pointer';
+    document.getElementById(id).title='Click to update';
+  });
+}
+</script>
+</body>
+</html>
